@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  db:
+    image: timescale/timescaledb:latest-pg16
+    container_name: news-timescaledb
+    environment:
+      POSTGRES_DB: news_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - news_db_data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: news-grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+volumes:
+  news_db_data:

@@ -1,0 +1,17 @@
+  services:
+  db:
+    image: timescale/timescaledb:2.15.3-pg16
+    container_name: news-timescaledb
+    restart: always
+    environment:
+      POSTGRES_DB: news_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
+
+volumes:
+  db_data:
