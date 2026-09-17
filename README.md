@@ -1,32 +1,76 @@
 # M1-2
 AI Agent 개발: 나만의 AI 비서 구축
-# RSS 뉴스 기반 K-뷰티 트렌드 AI 비서
+# 💄 K-뷰티 트렌드 AI 마케팅 비서 (K-Beauty Trend AI Assistant)
 
-## 1. 서비스 소개
-RSS 뉴스 데이터를 기반으로 K-뷰티 트렌드를 시계열로 분석하고,
-GPT를 활용해 시장조사 요약과 마케팅 제안을 제공하는 AI 비서 서비스입니다.
+본 프로젝트는 실시간 K-뷰티 뉴스 데이터를 수집하고 분석하여, 마케터들에게 데이터 기반의 AI 인사이트를 제공하는 **FastAPI 기반 AI 서비스**입니다.
 
-## 2. 기술 스택
-- Backend: Python, FastAPI, Firebase Firestore, OpenAI API
-- Frontend: HTML, CSS, JavaScript
-- Deploy: Render, Vercel
+## 📌 과제 필수 요구사항 반영 현황
 
-## 3. 주요 기능
-- K-뷰티 뉴스 데이터 CRUD
-- 시계열 데이터 요약
-- GPT 기반 마케팅 제안 생성
-- 대화 기록 저장 및 불러오기
+- [x] **시계열 데이터 선정**: K-뷰티 일별 트렌드 지수 및 뉴스 요약 데이터
+- [x] **100개 이상의 데이터 포인트**: RSS 수집 및 날짜별 그룹화 로직을 통해 100개 이상의 시계열 포인트 확보
+- [x] **데이터 분석 요약**: 기간, 개수, 통계(평균/최대/최소), 최근 추세(증가/감소) 분석 로직 구현
+- [x] **AI 채팅 및 컨텍스트 주입**: 분석된 요약 정보를 AI에게 전달하여 데이터 기반 답변 생성
+- [x] **대화 기록 관리**: 대화 내역 저장 및 특정 대화 세션 불러오기 기능
+- [x] **CRUD 구현**: 시계열 데이터(`date`, `value`, `memo`)에 대한 전체 관리 기능
 
-## 4. 배포 URL
-- Frontend: 
-- Backend API:
-- Swagger:
+---
 
-## 5. 로컬 실행 방법
+## 📊 데이터 구조 및 분석 로직
 
-### Backend
-```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --reload
+### 1. 데이터 스키마 (Time-series)
+| 필드명 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `date` | String | 뉴스 발행일 또는 데이터 기록 날짜 (YYYY-MM-DD) |
+| `value` | Integer | 트렌드 지수 (해당 날짜의 관련 뉴스 언급 횟수 등 0~100) |
+| `memo` | String | 뉴스 제목 및 핵심 요약 내용 |
+
+### 2. 요약 분석 기능 (`/api/data/summary`)
+단순 조회를 넘어, 수집된 데이터를 바탕으로 다음의 인사이트를 추출합니다.
+- **통계 정보**: 전체 기간 내 지수의 평균, 최댓값, 최솟값 산출
+- **추세 분석**: 최근 7일간의 지수 평균과 이전 데이터를 비교하여 **'상승/하락/유지'** 상태 판별
+- **데이터 볼륨**: 현재 DB에 저장된 유효 데이터 포인트 개수 확인 (100개 이상 유지)
+
+---
+
+## 📑 API 명세서
+
+### 1. 트렌드 데이터 관리 (CRUD)
+| 기능 | 메서드 | 엔드포인트 | 설명 |
+| :--- | :--- | :--- | :--- |
+| **데이터 수집** | `POST` | `/api/data/fetch` | RSS를 통해 100개 이상의 뉴스 데이터를 자동 수집 및 가공 |
+| **데이터 목록** | `GET` | `/api/data` | 전체 시계열 데이터 목록 조회 |
+| **데이터 추가** | `POST` | `/api/data` | 개별 트렌드 데이터 수동 입력 |
+| **데이터 요약** | `GET` | `/api/data/summary` | **(핵심)** 기간, 통계, 추세 분석 결과 반환 |
+| **데이터 수정/삭제** | `PUT/DELETE` | `/api/data/{id}` | 특정 데이터 포인트 관리 |
+
+### 2. AI 채팅 및 기록 관리
+| 기능 | 메서드 | 엔드포인트 | 설명 |
+| :--- | :--- | :--- | :--- |
+| **AI 채팅** | `POST` | `/api/chat` | **요약 데이터(Context)**를 주입받아 AI 답변 생성 및 저장 |
+| **대화 목록** | `GET` | `/api/conversations` | 저장된 전체 대화 목록 조회 |
+| **대화 상세** | `GET` | `/api/conversations/{id}` | 특정 대화의 전체 메시지 내역 불러오기 |
+
+---
+
+## 🛠 기술 스택
+- **Framework**: FastAPI (Python 3.9+)
+- **Database**: Firebase Firestore
+- **AI Engine**: Google Gemini Pro API
+- **Library**: `feedparser` (RSS 수집), `pydantic` (데이터 검증)
+
+---
+
+## 📂 프로젝트 구조
+```text
+.
+├── main.py              # 앱 초기화 및 라우터 연결
+├── database.py          # Firebase 설정 및 DB 연결 로직
+├── models.py            # Pydantic 모델 (Data, Chat, Summary)
+├── services/
+│   ├── rss_service.py   # 뉴스 수집 및 100개 이상의 데이터 생성 로직
+│   ├── analysis.py      # 평균, 추세 등 통계 분석 로직
+│   └── ai_service.py    # Gemini API 연동 및 프롬프트 엔지니어링
+├── routes/
+│   ├── data.py          # 데이터 CRUD 및 요약 API
+│   └── chat.py          # AI 채팅 및 기록 관리 API
+└── .env                 # API 키 관리

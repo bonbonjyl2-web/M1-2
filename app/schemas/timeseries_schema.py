@@ -7,6 +7,7 @@ class TimeSeriesBase(BaseModel):
     timestamp: datetime = Field(..., example="2023-10-27T10:00:00")
     value: float = Field(..., example=75.5)
     metric_name: str = Field(..., example="heart_rate")
+    content: Optional[str] = None  # [추가] 분석할 텍스트 필드 (선택 사항)
 
 # 2. 생성 요청 (Request): 클라이언트가 서버로 보낼 때
 # 보통 시계열은 여러 데이터를 리스트로 묶어서 보냅니다.
