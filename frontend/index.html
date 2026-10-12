@@ -1,113 +1,13 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K-Beauty AI 마케팅 비서</title>
-    
-    <!-- [추가] 차트를 그리기 위한 Chart.js 라이브러리 로드 -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        :root {
-            --primary: #ff7eb9;
-            --secondary: #7afcff;
-            --bg: #f8f9fa;
-            --card-bg: #ffffff;
-        }
-        body { background-color: var(--bg); font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .logo h1 { margin: 0; font-size: 1.5rem; color: var(--primary); }
-        .header-actions { display: flex; gap: 10px; align-items: center; }
-        input#userIdInput { padding: 10px; border: 1px solid #ddd; border-radius: 8px; width: 150px; }
-
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; margin-bottom: 20px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h3 { margin-top: 0; color: #333; display: flex; align-items: center; gap: 8px; }
-
-        /* [추가] 차트 컨테이너 높이 설정 */
-        .chart-container { position: relative; height: 250px; width: 100%; margin-bottom: 15px; }
-
-        .chat-window { height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 15px; border-radius: 10px; margin-bottom: 10px; background: #fafafa; }
-        .message { margin-bottom: 10px; padding: 10px 15px; border-radius: 15px; max-width: 80%; line-height: 1.5; }
-        .message.ai { background: #e3f2fd; align-self: flex-start; }
-        .message.user { background: var(--primary); color: white; margin-left: auto; }
-        .chat-input-group { display: flex; gap: 10px; }
-        .chat-input-group input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
-
-        .analysis-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .keyword-badge { display: inline-block; background: #f0f0f0; padding: 5px 12px; border-radius: 20px; margin: 3px; font-size: 0.9rem; color: #555; border: 1px solid #e0e0e0; }
-        .stat-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f9f9f9; }
-        .stat-label { color: #888; font-weight: 500; }
-        .stat-value { font-weight: bold; color: var(--primary); }
-
-        button { cursor: pointer; border: none; border-radius: 8px; padding: 10px 20px; font-weight: bold; transition: 0.3s; }
-        .btn-seed { background: #6c5ce7; color: white; }
-        .btn-send { background: var(--primary); color: white; }
-        button:hover { opacity: 0.8; transform: translateY(-2px); }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <h1>✨ K-Beauty AI Dashboard</h1>
-            </div>
-            <div class="header-actions">
-                <input type="text" id="userIdInput" placeholder="사용자 ID 입력" value="test_user_123">
-                <button class="btn-seed" onclick="seedData()">🚀 샘플 데이터 생성</button>
-            </div>
-        </header>
-
-        <div class="dashboard-grid">
-            <!-- 요약 카드 -->
-            <section class="card">
-                <h3>📈 실시간 지수 요약</h3>
-                <!-- [추가] 차트가 그려질 캔버스 태그 -->
-                <div class="chart-container">
-                    <canvas id="trendChart"></canvas>
-                </div>
-                <div id="trend-summary">
-                    <p style="color: #999;">데이터를 생성해주세요.</p>
-                </div>
-            </section>
-
-            <!-- 채팅 카드 -->
-            <section class="card">
-                <h3>💬 AI 마케팅 컨설팅</h3>
-                <div id="chat-window" class="chat-window">
-                    <div class="message ai">안녕하세요! 데이터를 기반으로 마케팅 전략을 제안해 드립니다. 😊</div>
-                </div>
-                <div class="chat-input-group">
-                    <input type="text" id="user-input" placeholder="궁금한 점을 물어보세요...">
-                    <button class="btn-send" onclick="sendMessage()">전송</button>
-                </div>
-            </section>
-        </div>
-
-        <div class="analysis-section">
-            <section class="card">
-                <h3>🔍 AI 뉴스 키워드 분석</h3>
-                <div id="keywords-area" style="margin-bottom: 15px;"></div>
-                <div id="summary-area" style="background: #fff9fb; padding: 15px; border-left: 4px solid var(--primary); font-size: 0.95rem; line-height: 1.6;">
-                    분석 전입니다.
-                </div>
-            </section>
-
-            <section class="card">
-                <h3>📊 데이터 통계 리포트</h3>
-                <div id="stats-area">
-                    <div class="stat-row"><span class="stat-label">평균 트렌드 지수</span><span id="stat-avg" class="stat-value">-</span></div>
-                    <div class="stat-row"><span class="stat-label">최고 수치 (Peak)</span><span id="stat-max" class="stat-value">-</span></div>
-                    <div class="stat-row"><span class="stat-label">최저 수치 (Bottom)</span><span id="stat-min" class="stat-value">-</span></div>
-                    <div class="stat-row"><span class="stat-label">분석 데이터 기간</span><span id="stat-count" class="stat-value">-</span></div>
-                </div>
-            </section>
-        </div>
-    </div>
-    <script src="js/main.js"></script>
-</body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>frontend</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
