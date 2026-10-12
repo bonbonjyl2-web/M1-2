@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles  # 1. 추가됨
 from app.core.config import settings
 from app.routers import chat_router, timeseries_router , nlp_router
 from pydantic import BaseModel
@@ -34,7 +33,9 @@ app.include_router(nlp_router.router, prefix="/api/v1/nlp", tags=["nlp"])
 
 # 3. 프론트엔드 정적 파일 연결 (맨 아래에 추가)
 # 이 설정이 frontend 폴더 안의 index.html을 기본 화면으로 띄워줍니다.
-app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+@app.get("/")
+def read_root():
+    return {"message": "FastAPI backend is running"}
 
 if __name__ == "__main__":
     import uvicorn
