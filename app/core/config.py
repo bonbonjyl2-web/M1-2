@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # 1. 최상위 루트 경로 설정 (app/core/config.py 기준 세 단계 위)
@@ -12,9 +11,9 @@ class Settings(BaseSettings):
     # .env 파일에서 읽어올 변수들 (기본값 설정으로 에러 방지)
     FIRESTORE_PROJECT_ID: str = "k-beauty-intellegence-chat-bot"
     GEMINI_API_KEY: str = "" # .env에 없으면 빈 값
-    
-    # ⭐ 중요: 테스트 코드처럼 '전체 경로'를 만들어 줍니다.
+    FIRESTORE_CREDENTIALS_JSON: str = ""
     GOOGLE_APPLICATION_CREDENTIALS: str = str(BASE_DIR / "serviceAccountKey.json")
+    CORS_ORIGINS: str = "*"
 
     # Pydantic 설정
     model_config = SettingsConfigDict(

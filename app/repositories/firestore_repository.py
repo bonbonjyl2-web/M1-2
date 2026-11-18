@@ -1,3 +1,4 @@
+import json
 from google.cloud import firestore
 from google.oauth2 import service_account 
 from app.core.config import settings
@@ -8,16 +9,28 @@ class FirestoreRepository:
     def __init__(self):
         # 1. 컬렉션 이름 반드시 정의!
         self.collection_name = "trends"
-        
-        current_file = Path(__file__).resolve()
-        base_dir = current_file.parent.parent.parent
-        key_path = base_dir / settings.GOOGLE_APPLICATION_CREDENTIALS
-        
-        if not key_path.exists():
-            raise FileNotFoundError(f"Key file not found at {key_path}")
 
         try:
-            credentials = service_account.Credentials.from_service_account_file(str(key_path))
+            if settings.FIRESTORE_CREDENTIALS_JSON:
+                service_account_info = json.loads(settings.FIRESTORE_CREDENTIALS_JSON)
+                credentials = service_account.Credentials.from_service_account_info(
+                    service_account_info
+                )
+            else:
+                current_file = Path(__file__).resolve()
+                base_dir = current_file.parent.parent.parent
+                key_path = base_dir / settings.GOOGLE_APPLICATION_CREDENTIALS
+
+                if not key_path.exists():
+                    raise FileNotFoundError(
+                        "Set FIRESTORE_CREDENTIALS_JSON or provide "
+                        f"GOOGLE_APPLICATION_CREDENTIALS at {key_path}"
+                    )
+
+                credentials = service_account.Credentials.from_service_account_file(
+                    str(key_path)
+                )
+
             self.db = firestore.Client(project=settings.FIRESTORE_PROJECT_ID, credentials=credentials)
             print(f"✅ Firestore 연결 성공!")
         except Exception as e:
