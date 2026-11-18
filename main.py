@@ -3,11 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routers import chat_router, timeseries_router , nlp_router
 from pydantic import BaseModel
-from konlpy.tag import Okt
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
-okt = Okt()
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 class TextRequest(BaseModel):
     text: str

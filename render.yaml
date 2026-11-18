@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: m1-2-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: FIRESTORE_PROJECT_ID
+        value: k-beauty-intellegence-chat-bot
+      - key: FIRESTORE_CREDENTIALS_JSON
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false

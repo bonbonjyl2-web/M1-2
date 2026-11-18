@@ -1,6 +1,12 @@
 # M1-2
 AI Agent 개발: 나만의 AI 비서 구축
 
+## Render 백엔드 배포
+
+Render에서 `New` > `Blueprint`로 이 저장소를 연결하면 `render.yaml`이 Docker 기반 API 서비스를 생성합니다. Docker 이미지에는 KoNLPy에 필요한 Java 런타임이 포함되며, Render의 `PORT` 환경변수에서 FastAPI가 실행됩니다. `/health` 경로를 health check로 사용합니다.
+
+Blueprint 생성 시 `FIRESTORE_CREDENTIALS_JSON`, `GEMINI_API_KEY`, `CORS_ORIGINS` 값을 입력하세요. Firestore 서비스 계정 JSON은 `FIRESTORE_CREDENTIALS_JSON` 비밀값으로 넣고, `CORS_ORIGINS`에는 실제 Vercel 도메인을 입력합니다. 환경 변수 예시는 [render.env.example](./render.env.example)을 참고하세요. 비밀값을 저장소에 커밋하거나 `VITE_` 변수로 노출하지 마세요.
+
 ## Vercel 프론트엔드 배포
 
 저장소 루트를 Vercel 프로젝트의 Root Directory로 사용합니다. 루트를 `frontend`로 지정하지 마세요. 저장소 루트의 `vercel.json`이 `frontend` 의존성을 설치하고 Vite 빌드를 실행해 `frontend/dist`를 배포합니다.
@@ -10,8 +16,6 @@ AI Agent 개발: 나만의 AI 비서 구축
 - Install Command, Build Command, Output Directory: 기본값 사용 (`vercel.json`에서 설정)
 
 프론트엔드 대시보드는 FastAPI의 트렌드 요약·차트·채팅 API를 사용합니다. Render에 백엔드를 배포한 뒤 Vercel 프로젝트의 Environment Variables에 `VITE_API_BASE_URL`을 추가하고 Render 서비스의 실제 기본 주소를 설정하세요. 환경 변수는 빌드 시 포함되므로 값을 바꾼 뒤에는 재배포해야 합니다. 대시보드에서도 백엔드 주소와 사용자 ID를 입력해 연결할 수 있으며, 기본 사용자 ID는 `user_123`입니다.
-
-Render 백엔드의 Environment Variables에 `FIRESTORE_PROJECT_ID`, `FIRESTORE_CREDENTIALS_JSON`, `GEMINI_API_KEY`, `CORS_ORIGINS`를 설정하세요. 변수 예시는 [render.env.example](./render.env.example)을 참고하세요. Firestore 서비스 계정 키 JSON 전체는 Render의 비밀 `FIRESTORE_CREDENTIALS_JSON` 값으로 넣습니다. 키와 Gemini API 키를 저장소에 커밋하거나 프론트엔드 `VITE_` 환경변수에 넣지 마세요. `CORS_ORIGINS`에는 Vercel 배포 도메인을 입력합니다. Render의 비밀값과 환경변수를 설정하기 전까지 백엔드는 Firestore/Gemini를 사용할 수 없습니다.
 
 백엔드에는 해당 사용자의 Firestore 데이터가 있어야 합니다. 데이터가 없다면 대시보드에서 샘플 데이터 생성을 선택할 수 있습니다.
 

@@ -1,0 +1,11 @@
+.git
+.env
+.venv
+venv
+serviceAccountKey.json
+__pycache__
+*.py[cod]
+*.log
+node_modules
+frontend/node_modules
+frontend/dist
