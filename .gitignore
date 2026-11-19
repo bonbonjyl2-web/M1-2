@@ -1,5 +1,7 @@
 serviceAccountKey.json
+render.json
 node_modules/
 .env
+*.env
 __pycache__/
 .DS_Store
