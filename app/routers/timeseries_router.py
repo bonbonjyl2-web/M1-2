@@ -17,7 +17,12 @@ async def seed_data(user_id: str):
 @router.get("/summary/{user_id}", response_model=TimeSeriesSummary)
 async def get_trend_summary(user_id: str, metric_name: str = "k_beauty_trend_index"):
     # ⭐ 여기도 await가 필요합니다!
-    summary = await timeseries_service.get_summary(user_id, metric_name)
+    try:
+        summary = await timeseries_service.get_summary(user_id, metric_name)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
     
     if not summary:
         raise HTTPException(status_code=404, detail="데이터를 찾을 수 없습니다.")
@@ -27,7 +32,12 @@ async def get_trend_summary(user_id: str, metric_name: str = "k_beauty_trend_ind
 async def get_trends(user_id: str):
     # 서비스에서 해당 유저의 모든 시계열 데이터를 가져오는 함수를 호출합니다.
     # (timeseries_service에 get_all_trends 함수가 있다고 가정)
-    result = await timeseries_service.get_all_trends(user_id)
+    try:
+        result = await timeseries_service.get_all_trends(user_id)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
     if not result:
         raise HTTPException(status_code=404, detail="데이터가 없습니다. 먼저 생성을 눌러주세요.")
     return result
