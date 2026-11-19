@@ -1,10 +1,15 @@
 from collections import Counter
-from konlpy.tag import Okt # 형태소 분석기
 from app.repositories.firestore_repository import firestore_repo
 
 class NLPService:
     def __init__(self):
-        self.okt = Okt()
+        self._okt = None
+
+    def _get_okt(self):
+        if self._okt is None:
+            from konlpy.tag import Okt
+            self._okt = Okt()
+        return self._okt
 
     async def analyze_kbeauty_trends(self, user_id: str):
         data_list = await firestore_repo.get_all_by_user(user_id)
@@ -19,7 +24,7 @@ class NLPService:
             content = item.get("content", "")
             if content:
                 # 명사만 추출 (Okt 사용)
-                nouns = self.okt.nouns(content)
+                nouns = self._get_okt().nouns(content)
                 all_nouns.extend(nouns)
 
         if not all_nouns:
