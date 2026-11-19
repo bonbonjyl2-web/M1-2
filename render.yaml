@@ -7,6 +7,8 @@ services:
     dockerContext: .
     healthCheckPath: /health
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
       - key: FIRESTORE_PROJECT_ID
         value: k-beauty-intellegence-chat-bot
       - key: FIRESTORE_CREDENTIALS_JSON
