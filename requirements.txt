@@ -2,9 +2,9 @@ fastapi==0.115.12
 uvicorn==0.34.2
 pydantic==2.11.4
 pydantic-settings==2.9.1
-firebase-admin==7.5.0
+firebase-admin==6.9.0
 google-cloud-firestore==2.21.0
-google-generativeai==0.8.5
+google-genai==1.48.0
 konlpy==0.6.0
 JPype1==1.5.2
 requests==2.32.3
