@@ -3,11 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routers import chat_router, timeseries_router , nlp_router
 from pydantic import BaseModel
-from konlpy.tag import Okt
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
-okt = Okt()
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 class TextRequest(BaseModel):
     text: str
@@ -15,7 +16,11 @@ class TextRequest(BaseModel):
 # CORS 설정 추가
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 모든 곳에서 접속 허용 (테스트용)
+    allow_origins=[
+        origin.strip()
+        for origin in settings.CORS_ORIGINS.split(",")
+        if origin.strip()
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
